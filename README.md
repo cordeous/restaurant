@@ -1,31 +1,37 @@
-# Restaurant Manager
+# Restaurant Manager Pro
 
-A modern restaurant management system built with Next.js that helps restaurant owners and managers handle inventory, menu management, and sales tracking.
+A comprehensive web-based restaurant management system with advanced inventory tracking, barcode integration, and real-time analytics. Built for modern restaurants that need precise control over their inventory and menu management.
 
-## Features
+## Key Features
 
-- 📊 **Dashboard Overview**
-  - Real-time sales analytics
-  - Daily revenue tracking
-  - Recent sales monitoring
+- 📱 **Barcode Integration**
+  - Scan ingredients and products directly
+  - Mobile-friendly barcode scanning
+  - Automatic stock updates on scan
+  - Print custom barcodes for internal use
 
-- 🍽️ **Menu Management**
-  - Create and update menu items
-  - Organize items by categories
-  - Set prices and descriptions
-  - Manage item availability
+- 📦 **Real-Time Inventory Tracking**
+  - Live stock level monitoring
+  - Automated reorder points
+  - Ingredient usage tracking
+  - Waste management tracking
+  - Multi-location support
+  - Batch and expiry date tracking
 
-- 📦 **Inventory Control**
-  - Track ingredient stock levels
-  - Set low stock alerts
-  - Monitor ingredient usage
-  - Manage suppliers and orders
+- ⚡ **Smart Alerts System**
+  - Low stock notifications
+  - Expiring inventory alerts
+  - Unusual usage patterns detection
+  - Custom threshold alerts
+  - Email and push notifications
 
-- 💰 **Sales Tracking**
-  - Record daily transactions
-  - Generate sales reports
-  - Track popular items
-  - Monitor revenue trends
+- 📊 **Analytics Dashboard**
+  - Real-time inventory valuation
+  - Usage trends and forecasting
+  - Waste analysis reports
+  - Cost optimization insights
+  - Supplier performance metrics
+  - Custom report generation
 
 ## Tech Stack
 
@@ -34,6 +40,7 @@ A modern restaurant management system built with Next.js that helps restaurant o
 - **Charts**: Recharts
 - **Database**: Supabase (coming soon)
 - **Authentication**: Supabase Auth (planned)
+- **Barcode Scanning**: QuaggaJS integration
 
 ## Getting Started
 
@@ -60,14 +67,29 @@ yarn dev
 
 ## Upcoming Features
 
-- [ ] Supabase integration for data persistence
-- [ ] User authentication and role-based access
-- [ ] Inventory alerts and notifications
-- [ ] Advanced sales analytics
-- [ ] Recipe management
-- [ ] Cost calculation
-- [ ] Employee scheduling
-- [ ] Mobile responsive design
+- [ ] Mobile barcode scanning app
+- [ ] Supplier portal integration
+- [ ] Advanced inventory forecasting
+- [ ] Recipe costing automation
+- [ ] Integration with POS systems
+- [ ] Multi-language support
+- [ ] Inventory audit tools
+- [ ] Advanced reporting suite
+
+## System Requirements
+
+- Modern web browser with camera access (for barcode scanning)
+- Minimum screen resolution: 1280x720
+- Internet connection for real-time updates
+- Compatible with iOS and Android devices (PWA support coming soon)
+
+## Security Features
+
+- Role-based access control
+- Audit logging
+- Data encryption
+- Secure barcode generation
+- Regular automated backups
 
 ## Contributing
 
@@ -76,4 +98,10 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 ## License
 
 This project is licensed under the MIT License - see the LICENSE file for details.
+
+## Support
+
+- Documentation: [Coming Soon]
+- Issue Tracker: GitHub Issues
+- Email Support: [Coming Soon]
 

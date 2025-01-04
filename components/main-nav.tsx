@@ -3,7 +3,15 @@
 import { useState } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { Menu, Store, BarChart3, ShoppingCart } from 'lucide-react'
+import { 
+  Store, 
+  BarChart3, 
+  Bell, 
+  Boxes,
+  Users,
+  Settings,
+  Menu
+} from 'lucide-react'
 
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
@@ -20,8 +28,10 @@ export function MainNav() {
   const routes = [
     { href: "/", label: "Dashboard", icon: BarChart3 },
     { href: "/inventory", label: "Inventory", icon: Store },
-    { href: "/sales", label: "Sales", icon: ShoppingCart },
-    { href: "/menu", label: "Menu", icon: Menu },
+    { href: "/stock", label: "Stock Control", icon: Boxes },
+    { href: "/alerts", label: "Alerts", icon: Bell },
+    { href: "/suppliers", label: "Suppliers", icon: Users },
+    { href: "/settings", label: "Settings", icon: Settings },
   ]
 
   return (
