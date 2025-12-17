@@ -13,81 +13,166 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
-import Image from "next/image"
 import Link from "next/link"
-import { ShoppingCart, Star, Clock, TrendingUp, Users, DollarSign } from "lucide-react"
+import { ShoppingCart, Star, Clock, TrendingUp, Users, DollarSign, Flame, Heart, ChevronRight, Sparkles, Timer, Leaf } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
+import { FoodImage } from "@/components/food-image"
 
-interface Order {
+interface FoodItem {
   id: string
   name: string
+  description: string
   time: string
   image: string
+  category: "main" | "appetizer" | "dessert" | "beverage" | "ramen" | "katsu" | "salad" | "noodles"
   price: number
+  originalPrice?: number
   rating: number
+  reviews: number
   status: "pending" | "delivered" | "finished"
+  calories?: number
+  prepTime?: string
+  ingredients?: string[]
+  spicyLevel?: number
+  isVegetarian?: boolean
+  isPopular?: boolean
+  isNew?: boolean
 }
 
 export default function HomePage() {
   const { toast } = useToast()
   const [cart, setCart] = useState<{ [key: string]: number }>({})
-  const [selectedDish, setSelectedDish] = useState<any>(null)
+  const [selectedDish, setSelectedDish] = useState<FoodItem | null>(null)
   const [isDetailsOpen, setIsDetailsOpen] = useState(false)
+  const [favorites, setFavorites] = useState<string[]>([])
 
   const categories = [
     {
       id: "1",
-      name: "Indonesian Food",
+      name: "Indonesian Cuisine",
+      description: "Traditional flavors with modern twist",
       image: "/food/indonesian.jpg",
       href: "/inventory",
       items: 24,
-      popular: true
+      popular: true,
+      category: "main" as const
     },
     {
       id: "2",
-      name: "Japanese Food",
+      name: "Japanese Delights",
+      description: "Authentic sushi & ramen",
       image: "/food/japanese.jpg",
       href: "/inventory",
       items: 18,
-      popular: true
+      popular: true,
+      category: "ramen" as const
     },
     {
       id: "3",
-      name: "Korean Food",
+      name: "Korean BBQ",
+      description: "Grilled perfection",
       image: "/food/korean.jpg",
       href: "/inventory",
       items: 15,
-      popular: false
+      popular: false,
+      category: "main" as const
+    },
+    {
+      id: "4",
+      name: "Fresh Salads",
+      description: "Healthy & delicious",
+      image: "/food/salads.jpg",
+      href: "/inventory",
+      items: 12,
+      popular: false,
+      category: "salad" as const
     }
   ]
 
-  const [orders, setOrders] = useState<Order[]>([
+  const [orders, setOrders] = useState<FoodItem[]>([
     {
       id: "1",
-      name: "Sambal Fried Fish with Fresh Vegetables",
+      name: "Sambal Fried Fish",
+      description: "Crispy fried fish with spicy sambal sauce, served with fresh vegetables and steamed rice. A perfect blend of Indonesian spices.",
       time: "7 Dec, 18:10",
       image: "/food/sambal-fish.jpg",
+      category: "main",
       price: 32.0,
-      rating: 4.5,
-      status: "pending"
+      originalPrice: 38.0,
+      rating: 4.8,
+      reviews: 234,
+      status: "pending",
+      calories: 580,
+      prepTime: "25 min",
+      ingredients: ["Fresh Fish", "Sambal", "Vegetables", "Rice"],
+      spicyLevel: 3,
+      isPopular: true
     },
     {
       id: "2",
-      name: "Archipelago Noodles with Chicken Katsu",
+      name: "Archipelago Noodles",
+      description: "Stir-fried noodles with chicken katsu, fresh vegetables, and our signature archipelago sauce. A fusion of flavors.",
       time: "7 Dec, 18:10",
       image: "/food/noodles.jpg",
+      category: "noodles",
       price: 28.0,
-      rating: 4.8,
-      status: "pending"
+      rating: 4.9,
+      reviews: 189,
+      status: "pending",
+      calories: 720,
+      prepTime: "20 min",
+      ingredients: ["Egg Noodles", "Chicken", "Vegetables", "Special Sauce"],
+      spicyLevel: 2,
+      isNew: true
     },
     {
       id: "3",
       name: "Spicy Ramen Bowl",
+      description: "Rich tonkotsu broth with perfectly cooked noodles, chashu pork, soft-boiled egg, and fresh toppings.",
       time: "6 Dec, 20:15",
       image: "/food/ramen.jpg",
+      category: "ramen",
       price: 24.0,
       rating: 4.7,
-      status: "delivered"
+      reviews: 312,
+      status: "delivered",
+      calories: 650,
+      prepTime: "15 min",
+      ingredients: ["Ramen Noodles", "Pork", "Egg", "Nori", "Green Onion"],
+      spicyLevel: 4,
+      isPopular: true
+    },
+    {
+      id: "4",
+      name: "Chicken Katsu Curry",
+      description: "Crispy breaded chicken cutlet served with Japanese curry sauce and fluffy rice.",
+      time: "6 Dec, 19:30",
+      image: "/food/katsu.jpg",
+      category: "katsu",
+      price: 26.0,
+      rating: 4.6,
+      reviews: 156,
+      status: "delivered",
+      calories: 780,
+      prepTime: "30 min",
+      ingredients: ["Chicken Breast", "Panko", "Curry Sauce", "Rice"],
+      spicyLevel: 1
+    },
+    {
+      id: "5",
+      name: "Garden Fresh Salad",
+      description: "Mixed greens with cherry tomatoes, cucumber, avocado, and citrus vinaigrette dressing.",
+      time: "5 Dec, 12:00",
+      image: "/food/salad.jpg",
+      category: "salad",
+      price: 18.0,
+      rating: 4.5,
+      reviews: 98,
+      status: "finished",
+      calories: 280,
+      prepTime: "10 min",
+      ingredients: ["Mixed Greens", "Tomatoes", "Avocado", "Citrus Dressing"],
+      isVegetarian: true
     }
   ])
 
@@ -97,34 +182,34 @@ export default function HomePage() {
       value: "$1,234",
       icon: DollarSign,
       change: "+12%",
-      color: "text-green-500"
+      color: "from-green-500 to-emerald-600"
     },
     {
       title: "Active Orders",
       value: "24",
       icon: ShoppingCart,
       change: "+5",
-      color: "text-blue-500"
+      color: "from-blue-500 to-indigo-600"
     },
     {
       title: "Total Customers",
       value: "892",
       icon: Users,
       change: "+18%",
-      color: "text-purple-500"
+      color: "from-purple-500 to-violet-600"
     },
     {
       title: "Popular Items",
       value: "12",
       icon: TrendingUp,
       change: "+3",
-      color: "text-orange-500"
+      color: "from-orange-500 to-red-500"
     }
   ]
 
-  const handleOrderAgain = (order: Order) => {
+  const handleOrderAgain = (order: FoodItem) => {
     toast({
-      title: "Added to Cart!",
+      title: "Added to Cart! 🛒",
       description: `${order.name} has been added to your cart.`,
     })
     setCart(prev => ({
@@ -133,9 +218,19 @@ export default function HomePage() {
     }))
   }
 
-  const handleViewDetails = (order: Order) => {
+  const handleViewDetails = (order: FoodItem) => {
     setSelectedDish(order)
     setIsDetailsOpen(true)
+  }
+
+  const toggleFavorite = (id: string) => {
+    setFavorites(prev => 
+      prev.includes(id) ? prev.filter(f => f !== id) : [...prev, id]
+    )
+    toast({
+      title: favorites.includes(id) ? "Removed from favorites" : "Added to favorites ❤️",
+      description: favorites.includes(id) ? "Item removed from your favorites" : "You can find this in your favorites",
+    })
   }
 
   const moveToDelivered = (orderId: string) => {
@@ -143,7 +238,7 @@ export default function HomePage() {
       order.id === orderId ? { ...order, status: "delivered" } : order
     ))
     toast({
-      title: "Order Delivered!",
+      title: "Order Delivered! 🎉",
       description: "Order has been marked as delivered.",
     })
   }
@@ -153,53 +248,82 @@ export default function HomePage() {
       order.id === orderId ? { ...order, status: "finished" } : order
     ))
     toast({
-      title: "Order Completed!",
+      title: "Order Completed! ✅",
       description: "Order has been marked as finished.",
     })
   }
 
+  const renderSpicyLevel = (level: number) => {
+    return (
+      <div className="flex items-center gap-0.5">
+        {[1, 2, 3, 4, 5].map((i) => (
+          <Flame 
+            key={i} 
+            className={`h-3 w-3 ${i <= level ? 'text-red-500 fill-red-500' : 'text-gray-300'}`} 
+          />
+        ))}
+      </div>
+    )
+  }
+
   return (
-    <div className="flex-1 space-y-6 p-8 pt-6">
-      <div className="flex flex-col space-y-6">
-        {/* Banner */}
-        <Card className="bg-gradient-to-r from-orange-400 to-orange-500 border-none text-white overflow-hidden hover:shadow-xl transition-shadow">
-          <CardContent className="flex items-center justify-between p-6">
-            <div className="space-y-2 flex-1">
-              <h2 className="text-3xl font-bold">Discount New Menu!</h2>
-              <p className="text-orange-100 text-lg">
-                Get Free Shipping Every $20 With No Minimum Purchase
-              </p>
-              <Button className="mt-4 bg-white text-orange-500 hover:bg-orange-50">
+    <div className="flex-1 space-y-6 sm:space-y-8">
+      {/* Hero Banner */}
+      <div className="relative overflow-hidden rounded-2xl sm:rounded-3xl mx-2 sm:mx-0">
+        <div className="absolute inset-0 bg-gradient-to-r from-orange-500 via-orange-400 to-yellow-400" />
+        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4xIj48cGF0aCBkPSJNMzYgMzRjMC0yLjIxLTEuNzktNC00LTRzLTQgMS43OS00IDQgMS43OSA0IDQgNCA0LTEuNzkgNC00eiIvPjwvZz48L2c+PC9zdmc+')] opacity-30" />
+        <div className="relative px-4 sm:px-8 py-8 sm:py-12 flex flex-col md:flex-row items-center justify-between gap-6">
+          <div className="space-y-3 sm:space-y-4 text-center md:text-left flex-1">
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-white/20 backdrop-blur-sm rounded-full text-white text-sm">
+              <Sparkles className="h-4 w-4" />
+              <span>Special Offer</span>
+            </div>
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white leading-tight">
+              Discount New Menu!
+            </h2>
+            <p className="text-orange-100 text-base sm:text-lg max-w-md">
+              Get Free Shipping Every $20 With No Minimum Purchase. Limited time offer!
+            </p>
+            <div className="flex flex-col sm:flex-row gap-3 justify-center md:justify-start">
+              <Button size="lg" className="bg-white text-orange-500 hover:bg-orange-50 shadow-lg shadow-orange-600/30 hover:shadow-xl transition-all duration-300 hover:-translate-y-0.5">
                 Order Now
+                <ChevronRight className="ml-1 h-4 w-4" />
+              </Button>
+              <Button size="lg" variant="outline" className="border-white/30 text-white hover:bg-white/20 backdrop-blur-sm">
+                View Menu
               </Button>
             </div>
-            <div className="hidden md:block">
-              <Image
-                src="/food/banner.png"
-                alt="Food Banner"
-                width={300}
-                height={200}
-                className="rounded-lg"
-              />
-            </div>
-          </CardContent>
-        </Card>
+          </div>
+          <div className="hidden md:block w-64 lg:w-80 h-48 lg:h-56 relative animate-float">
+            <FoodImage 
+              alt="Food Banner"
+              category="main"
+              className="rounded-2xl shadow-2xl"
+            />
+          </div>
+        </div>
+      </div>
 
-        {/* Quick Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          {quickStats.map((stat) => {
+      {/* Quick Stats - Horizontal Scroll on Mobile */}
+      <div className="px-2 sm:px-0">
+        <div className="flex gap-3 sm:gap-4 overflow-x-auto pb-2 sm:pb-0 sm:grid sm:grid-cols-2 lg:grid-cols-4 scrollbar-thin">
+          {quickStats.map((stat, index) => {
             const Icon = stat.icon
             return (
-              <Card key={stat.title} className="hover:shadow-lg transition-all cursor-pointer hover:border-orange-500">
-                <CardContent className="p-6">
+              <Card 
+                key={stat.title} 
+                className={`min-w-[160px] sm:min-w-0 hover-lift cursor-pointer border-0 shadow-soft animate-slide-up`}
+                style={{ animationDelay: `${index * 100}ms` }}
+              >
+                <CardContent className="p-4 sm:p-6">
                   <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm text-muted-foreground">{stat.title}</p>
-                      <p className="text-2xl font-bold mt-1">{stat.value}</p>
-                      <p className={`text-sm mt-1 ${stat.color}`}>{stat.change}</p>
+                    <div className="space-y-1">
+                      <p className="text-xs sm:text-sm text-muted-foreground">{stat.title}</p>
+                      <p className="text-xl sm:text-2xl font-bold">{stat.value}</p>
+                      <p className="text-xs sm:text-sm text-green-500 font-medium">{stat.change}</p>
                     </div>
-                    <div className={`h-12 w-12 rounded-full bg-orange-100 flex items-center justify-center ${stat.color}`}>
-                      <Icon className="h-6 w-6" />
+                    <div className={`h-10 w-10 sm:h-12 sm:w-12 rounded-xl bg-gradient-to-br ${stat.color} flex items-center justify-center shadow-lg`}>
+                      <Icon className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
                     </div>
                   </div>
                 </CardContent>
@@ -207,280 +331,335 @@ export default function HomePage() {
             )
           })}
         </div>
+      </div>
 
-        {/* Categories */}
-        <div className="space-y-4">
-          <div className="flex justify-between items-center">
-            <div>
-              <h2 className="text-2xl font-bold">Categories</h2>
-              <p className="text-muted-foreground">Explore our food categories</p>
-            </div>
-            <Link href="/inventory" className="text-orange-500 hover:underline font-medium">
-              See all →
-            </Link>
+      {/* Categories Section */}
+      <div className="space-y-4 px-2 sm:px-0">
+        <div className="flex justify-between items-center">
+          <div>
+            <h2 className="text-xl sm:text-2xl font-bold">Categories</h2>
+            <p className="text-sm text-muted-foreground hidden sm:block">Explore our food categories</p>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {categories.map((category) => (
-              <Link href={category.href} key={category.id}>
-                <Card className="overflow-hidden hover:shadow-lg transition-all duration-300 group">
-                  <div className="relative h-48">
-                    <Image
-                      src={category.image}
-                      alt={category.name}
-                      fill
-                      className="object-cover group-hover:scale-110 transition-transform duration-300"
-                    />
-                    {category.popular && (
-                      <Badge className="absolute top-2 right-2 bg-orange-500">
-                        Popular
-                      </Badge>
-                    )}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-                    <div className="absolute bottom-0 left-0 right-0 p-4 text-white">
-                      <h3 className="font-semibold text-lg">{category.name}</h3>
-                      <p className="text-sm text-white/80">{category.items} items available</p>
-                    </div>
-                  </div>
-                </Card>
-              </Link>
-            ))}
-          </div>
+          <Link href="/inventory" className="text-orange-500 hover:text-orange-600 font-medium text-sm flex items-center gap-1 transition-colors">
+            See all
+            <ChevronRight className="h-4 w-4" />
+          </Link>
         </div>
-
-        {/* Recent Orders */}
-        <div className="space-y-4">
-          <div className="flex justify-between items-center">
-            <div>
-              <h2 className="text-2xl font-bold">Recent Orders</h2>
-              <p className="text-muted-foreground">Track and manage your orders</p>
-            </div>
-            <div className="flex items-center gap-2">
-              {Object.keys(cart).length > 0 && (
-                <Badge variant="secondary" className="px-3 py-1">
-                  <ShoppingCart className="h-3 w-3 mr-1" />
-                  {Object.values(cart).reduce((a, b) => a + b, 0)} items
-                </Badge>
-              )}
-            </div>
-          </div>
-          <Tabs defaultValue="pending" className="w-full">
-            <TabsList className="grid w-full grid-cols-3">
-              <TabsTrigger value="pending">
-                Pending ({orders.filter(o => o.status === "pending").length})
-              </TabsTrigger>
-              <TabsTrigger value="delivered">
-                Delivered ({orders.filter(o => o.status === "delivered").length})
-              </TabsTrigger>
-              <TabsTrigger value="finished">
-                Finished ({orders.filter(o => o.status === "finished").length})
-              </TabsTrigger>
-            </TabsList>
-            <TabsContent value="pending" className="space-y-4 mt-4">
-              {orders.filter(order => order.status === "pending").map((order) => (
-                <Card key={order.id} className="hover:shadow-md transition-all group">
-                  <CardContent className="p-4 flex items-center space-x-4">
-                    <div className="relative h-20 w-20 rounded-lg overflow-hidden">
-                      <Image
-                        src={order.image}
-                        alt={order.name}
-                        fill
-                        className="object-cover group-hover:scale-110 transition-transform duration-300"
-                      />
-                    </div>
-                    <div className="flex-1">
-                      <h3 className="font-medium">{order.name}</h3>
-                      <div className="flex items-center gap-2 mt-1">
-                        <div className="flex items-center">
-                          <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                          <span className="text-sm ml-1">{order.rating}</span>
-                        </div>
-                        <span className="text-sm text-muted-foreground">•</span>
-                        <div className="flex items-center text-sm text-muted-foreground">
-                          <Clock className="h-3 w-3 mr-1" />
-                          {order.time}
-                        </div>
-                      </div>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <div className="text-right mr-2">
-                        <span className="font-bold text-lg">${order.price.toFixed(2)}</span>
-                      </div>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handleViewDetails(order)}
-                      >
-                        View
-                      </Button>
-                      <Button
-                        size="sm"
-                        className="bg-orange-500 hover:bg-orange-600"
-                        onClick={() => moveToDelivered(order.id)}
-                      >
-                        Mark Delivered
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-              {orders.filter(o => o.status === "pending").length === 0 && (
-                <div className="text-center py-10 text-muted-foreground">
-                  <ShoppingCart className="h-12 w-12 mx-auto mb-2 opacity-50" />
-                  <p>No pending orders</p>
+        
+        {/* Horizontal scroll on mobile, grid on larger screens */}
+        <div className="flex gap-3 sm:gap-4 overflow-x-auto pb-2 sm:pb-0 sm:grid sm:grid-cols-2 lg:grid-cols-4 scrollbar-thin stagger-children">
+          {categories.map((category) => (
+            <Link href={category.href} key={category.id} className="block min-w-[200px] sm:min-w-0">
+              <Card className="overflow-hidden card-hover group border-0 shadow-soft h-full">
+                <div className="relative h-32 sm:h-40">
+                  <FoodImage
+                    src={category.image}
+                    alt={category.name}
+                    category={category.category}
+                    className="group-hover:scale-110 transition-transform duration-500"
+                  />
+                  {category.popular && (
+                    <Badge className="absolute top-2 right-2 bg-gradient-to-r from-orange-500 to-red-500 border-0 shadow-lg">
+                      🔥 Popular
+                    </Badge>
+                  )}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+                  <div className="absolute bottom-0 left-0 right-0 p-3 sm:p-4 text-white">
+                    <h3 className="font-semibold text-base sm:text-lg">{category.name}</h3>
+                    <p className="text-xs sm:text-sm text-white/80 line-clamp-1">{category.description}</p>
+                    <p className="text-xs text-white/60 mt-1">{category.items} items</p>
+                  </div>
                 </div>
-              )}
-            </TabsContent>
-            <TabsContent value="delivered" className="space-y-4 mt-4">
-              {orders.filter(order => order.status === "delivered").map((order) => (
-                <Card key={order.id} className="hover:shadow-md transition-all group">
-                  <CardContent className="p-4 flex items-center space-x-4">
-                    <div className="relative h-20 w-20 rounded-lg overflow-hidden">
-                      <Image
-                        src={order.image}
-                        alt={order.name}
-                        fill
-                        className="object-cover group-hover:scale-110 transition-transform duration-300"
-                      />
-                    </div>
-                    <div className="flex-1">
-                      <h3 className="font-medium">{order.name}</h3>
-                      <div className="flex items-center gap-2 mt-1">
-                        <div className="flex items-center">
-                          <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                          <span className="text-sm ml-1">{order.rating}</span>
-                        </div>
-                        <span className="text-sm text-muted-foreground">•</span>
-                        <span className="text-sm text-muted-foreground">{order.time}</span>
-                      </div>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <div className="text-right mr-2">
-                        <span className="font-bold text-lg">${order.price.toFixed(2)}</span>
-                      </div>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handleOrderAgain(order)}
-                      >
-                        Order Again
-                      </Button>
-                      <Button
-                        size="sm"
-                        className="bg-green-500 hover:bg-green-600"
-                        onClick={() => moveToFinished(order.id)}
-                      >
-                        Finish
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-              {orders.filter(o => o.status === "delivered").length === 0 && (
-                <div className="text-center py-10 text-muted-foreground">
-                  No delivered orders yet
-                </div>
-              )}
-            </TabsContent>
-            <TabsContent value="finished" className="space-y-4 mt-4">
-              {orders.filter(order => order.status === "finished").map((order) => (
-                <Card key={order.id} className="hover:shadow-md transition-all group opacity-75">
-                  <CardContent className="p-4 flex items-center space-x-4">
-                    <div className="relative h-20 w-20 rounded-lg overflow-hidden">
-                      <Image
-                        src={order.image}
-                        alt={order.name}
-                        fill
-                        className="object-cover"
-                      />
-                    </div>
-                    <div className="flex-1">
-                      <h3 className="font-medium">{order.name}</h3>
-                      <div className="flex items-center gap-2 mt-1">
-                        <div className="flex items-center">
-                          <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                          <span className="text-sm ml-1">{order.rating}</span>
-                        </div>
-                        <span className="text-sm text-muted-foreground">•</span>
-                        <span className="text-sm text-muted-foreground">{order.time}</span>
-                        <Badge variant="secondary" className="ml-2">Completed</Badge>
-                      </div>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <div className="text-right mr-2">
-                        <span className="font-bold text-lg">${order.price.toFixed(2)}</span>
-                      </div>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handleOrderAgain(order)}
-                        className="bg-orange-500 text-white hover:bg-orange-600"
-                      >
-                        Order Again
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-              {orders.filter(o => o.status === "finished").length === 0 && (
-                <div className="text-center py-10 text-muted-foreground">
-                  No finished orders yet
-                </div>
-              )}
-            </TabsContent>
-          </Tabs>
+              </Card>
+            </Link>
+          ))}
         </div>
       </div>
 
-      {/* Order Details Dialog */}
-      <Dialog open={isDetailsOpen} onOpenChange={setIsDetailsOpen}>
-        <DialogContent className="max-w-2xl">
-          <DialogHeader>
-            <DialogTitle>Order Details</DialogTitle>
-            <DialogDescription>View complete order information</DialogDescription>
-          </DialogHeader>
-          {selectedDish && (
-            <div className="space-y-4">
-              <div className="relative h-64 w-full rounded-lg overflow-hidden">
-                <Image
-                  src={selectedDish.image}
-                  alt={selectedDish.name}
-                  fill
-                  className="object-cover"
-                />
-              </div>
-              <div>
-                <h3 className="text-2xl font-bold">{selectedDish.name}</h3>
-                <div className="flex items-center gap-4 mt-2">
-                  <div className="flex items-center">
-                    <Star className="h-5 w-5 fill-yellow-400 text-yellow-400" />
-                    <span className="ml-1 font-medium">{selectedDish.rating}</span>
+      {/* Recent Orders Section */}
+      <div className="space-y-4 px-2 sm:px-0">
+        <div className="flex justify-between items-center">
+          <div>
+            <h2 className="text-xl sm:text-2xl font-bold">Recent Orders</h2>
+            <p className="text-sm text-muted-foreground hidden sm:block">Track and manage your orders</p>
+          </div>
+          {Object.keys(cart).length > 0 && (
+            <Badge variant="secondary" className="px-3 py-1.5 bg-orange-100 text-orange-600">
+              <ShoppingCart className="h-3 w-3 mr-1.5" />
+              {Object.values(cart).reduce((a, b) => a + b, 0)} items
+            </Badge>
+          )}
+        </div>
+        
+        <Tabs defaultValue="pending" className="w-full">
+          <TabsList className="w-full sm:w-auto grid grid-cols-3 h-auto p-1 bg-gray-100/80">
+            <TabsTrigger value="pending" className="text-xs sm:text-sm py-2 data-[state=active]:bg-white data-[state=active]:shadow-sm">
+              Pending ({orders.filter(o => o.status === "pending").length})
+            </TabsTrigger>
+            <TabsTrigger value="delivered" className="text-xs sm:text-sm py-2 data-[state=active]:bg-white data-[state=active]:shadow-sm">
+              Delivered ({orders.filter(o => o.status === "delivered").length})
+            </TabsTrigger>
+            <TabsTrigger value="finished" className="text-xs sm:text-sm py-2 data-[state=active]:bg-white data-[state=active]:shadow-sm">
+              Finished ({orders.filter(o => o.status === "finished").length})
+            </TabsTrigger>
+          </TabsList>
+          
+          {["pending", "delivered", "finished"].map(status => (
+            <TabsContent key={status} value={status} className="space-y-3 sm:space-y-4 mt-4">
+              {orders.filter(order => order.status === status).map((order, index) => (
+                <Card 
+                  key={order.id} 
+                  className={`overflow-hidden border-0 shadow-soft hover-lift animate-slide-up ${status === "finished" ? "opacity-70" : ""}`}
+                  style={{ animationDelay: `${index * 100}ms` }}
+                >
+                  <CardContent className="p-3 sm:p-4">
+                    <div className="flex gap-3 sm:gap-4">
+                      {/* Food Image */}
+                      <div 
+                        className="relative w-20 h-20 sm:w-24 sm:h-24 rounded-xl overflow-hidden flex-shrink-0 cursor-pointer group"
+                        onClick={() => handleViewDetails(order)}
+                      >
+                        <FoodImage
+                          src={order.image}
+                          alt={order.name}
+                          category={order.category}
+                          className="group-hover:scale-110 transition-transform duration-300"
+                        />
+                        {order.originalPrice && (
+                          <Badge className="absolute top-1 left-1 bg-red-500 text-[10px] px-1.5 py-0.5">
+                            Sale
+                          </Badge>
+                        )}
+                      </div>
+
+                      {/* Content */}
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-start justify-between gap-2">
+                          <div className="min-w-0 flex-1">
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <h3 className="font-semibold text-sm sm:text-base line-clamp-1">{order.name}</h3>
+                              {order.isNew && (
+                                <Badge variant="secondary" className="bg-blue-100 text-blue-600 text-[10px] px-1.5">New</Badge>
+                              )}
+                              {order.isPopular && (
+                                <Badge variant="secondary" className="bg-orange-100 text-orange-600 text-[10px] px-1.5">Popular</Badge>
+                              )}
+                            </div>
+                            <p className="text-xs sm:text-sm text-muted-foreground line-clamp-2 mt-0.5">
+                              {order.description}
+                            </p>
+                          </div>
+                          <button 
+                            onClick={() => toggleFavorite(order.id)}
+                            className="p-1.5 rounded-full hover:bg-gray-100 transition-colors flex-shrink-0"
+                          >
+                            <Heart className={`h-4 w-4 sm:h-5 sm:w-5 transition-colors ${favorites.includes(order.id) ? 'fill-red-500 text-red-500' : 'text-gray-400'}`} />
+                          </button>
+                        </div>
+
+                        {/* Stats Row */}
+                        <div className="flex items-center gap-2 sm:gap-3 mt-2 flex-wrap">
+                          <div className="flex items-center gap-1">
+                            <Star className="h-3 w-3 sm:h-4 sm:w-4 fill-yellow-400 text-yellow-400" />
+                            <span className="text-xs sm:text-sm font-medium">{order.rating}</span>
+                            <span className="text-xs text-muted-foreground">({order.reviews})</span>
+                          </div>
+                          {order.prepTime && (
+                            <div className="flex items-center gap-1 text-muted-foreground">
+                              <Timer className="h-3 w-3" />
+                              <span className="text-xs">{order.prepTime}</span>
+                            </div>
+                          )}
+                          {order.calories && (
+                            <span className="text-xs text-muted-foreground">{order.calories} cal</span>
+                          )}
+                          {order.spicyLevel && order.spicyLevel > 0 && (
+                            <div className="hidden sm:block">{renderSpicyLevel(order.spicyLevel)}</div>
+                          )}
+                          {order.isVegetarian && (
+                            <Badge variant="outline" className="text-green-600 border-green-200 text-[10px] px-1.5 py-0">
+                              <Leaf className="h-2.5 w-2.5 mr-0.5" />
+                              Veg
+                            </Badge>
+                          )}
+                        </div>
+
+                        {/* Price & Actions */}
+                        <div className="flex items-center justify-between mt-3 gap-2">
+                          <div className="flex items-baseline gap-2">
+                            <span className="font-bold text-base sm:text-lg text-orange-500">${order.price.toFixed(2)}</span>
+                            {order.originalPrice && (
+                              <span className="text-xs sm:text-sm text-muted-foreground line-through">${order.originalPrice.toFixed(2)}</span>
+                            )}
+                          </div>
+                          <div className="flex items-center gap-2">
+                            {status === "pending" && (
+                              <>
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  className="text-xs h-8 hidden sm:flex"
+                                  onClick={() => handleViewDetails(order)}
+                                >
+                                  View
+                                </Button>
+                                <Button
+                                  size="sm"
+                                  className="text-xs h-8 bg-orange-500 hover:bg-orange-600"
+                                  onClick={() => moveToDelivered(order.id)}
+                                >
+                                  Delivered
+                                </Button>
+                              </>
+                            )}
+                            {status === "delivered" && (
+                              <>
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  className="text-xs h-8"
+                                  onClick={() => handleOrderAgain(order)}
+                                >
+                                  Reorder
+                                </Button>
+                                <Button
+                                  size="sm"
+                                  className="text-xs h-8 bg-green-500 hover:bg-green-600"
+                                  onClick={() => moveToFinished(order.id)}
+                                >
+                                  Complete
+                                </Button>
+                              </>
+                            )}
+                            {status === "finished" && (
+                              <Button
+                                size="sm"
+                                className="text-xs h-8 bg-orange-500 hover:bg-orange-600"
+                                onClick={() => handleOrderAgain(order)}
+                              >
+                                Order Again
+                              </Button>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+              
+              {orders.filter(o => o.status === status).length === 0 && (
+                <div className="text-center py-12 px-4">
+                  <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gray-100 flex items-center justify-center">
+                    <ShoppingCart className="h-8 w-8 text-gray-400" />
                   </div>
-                  <span className="text-muted-foreground">•</span>
-                  <span className="text-muted-foreground">{selectedDish.time}</span>
+                  <p className="text-muted-foreground">No {status} orders</p>
+                </div>
+              )}
+            </TabsContent>
+          ))}
+        </Tabs>
+      </div>
+
+      {/* Food Details Dialog */}
+      <Dialog open={isDetailsOpen} onOpenChange={setIsDetailsOpen}>
+        <DialogContent className="max-w-lg sm:max-w-2xl max-h-[90vh] overflow-y-auto p-0">
+          <div className="relative h-48 sm:h-64">
+            {selectedDish && (
+              <FoodImage
+                src={selectedDish.image}
+                alt={selectedDish.name}
+                category={selectedDish.category}
+              />
+            )}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+            <div className="absolute bottom-4 left-4 right-4 text-white">
+              <h3 className="text-xl sm:text-2xl font-bold">{selectedDish?.name}</h3>
+              <div className="flex items-center gap-3 mt-2">
+                <div className="flex items-center gap-1">
+                  <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                  <span className="font-medium">{selectedDish?.rating}</span>
+                  <span className="text-white/70 text-sm">({selectedDish?.reviews} reviews)</span>
                 </div>
               </div>
-              <div className="flex items-center justify-between p-4 bg-orange-50 rounded-lg">
-                <span className="font-medium">Total Price</span>
-                <span className="text-2xl font-bold text-orange-500">
-                  ${selectedDish.price.toFixed(2)}
-                </span>
+            </div>
+            <button 
+              onClick={() => selectedDish && toggleFavorite(selectedDish.id)}
+              className="absolute top-4 right-4 p-2 rounded-full bg-white/20 backdrop-blur-sm hover:bg-white/30 transition-colors"
+            >
+              <Heart className={`h-5 w-5 ${selectedDish && favorites.includes(selectedDish.id) ? 'fill-red-500 text-red-500' : 'text-white'}`} />
+            </button>
+          </div>
+          
+          {selectedDish && (
+            <div className="p-4 sm:p-6 space-y-4">
+              <p className="text-muted-foreground">{selectedDish.description}</p>
+              
+              {/* Quick Info */}
+              <div className="grid grid-cols-3 gap-3">
+                {selectedDish.prepTime && (
+                  <div className="text-center p-3 bg-gray-50 rounded-xl">
+                    <Timer className="h-5 w-5 mx-auto text-orange-500" />
+                    <p className="text-xs text-muted-foreground mt-1">Prep Time</p>
+                    <p className="font-medium text-sm">{selectedDish.prepTime}</p>
+                  </div>
+                )}
+                {selectedDish.calories && (
+                  <div className="text-center p-3 bg-gray-50 rounded-xl">
+                    <Flame className="h-5 w-5 mx-auto text-orange-500" />
+                    <p className="text-xs text-muted-foreground mt-1">Calories</p>
+                    <p className="font-medium text-sm">{selectedDish.calories}</p>
+                  </div>
+                )}
+                {selectedDish.spicyLevel !== undefined && (
+                  <div className="text-center p-3 bg-gray-50 rounded-xl">
+                    <div className="flex justify-center">{renderSpicyLevel(selectedDish.spicyLevel)}</div>
+                    <p className="text-xs text-muted-foreground mt-1">Spicy Level</p>
+                    <p className="font-medium text-sm">{selectedDish.spicyLevel}/5</p>
+                  </div>
+                )}
+              </div>
+
+              {/* Ingredients */}
+              {selectedDish.ingredients && (
+                <div>
+                  <h4 className="font-medium mb-2">Ingredients</h4>
+                  <div className="flex flex-wrap gap-2">
+                    {selectedDish.ingredients.map((ing, idx) => (
+                      <Badge key={idx} variant="secondary" className="px-3 py-1">{ing}</Badge>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Price Section */}
+              <div className="flex items-center justify-between p-4 bg-orange-50 rounded-xl">
+                <div>
+                  <span className="text-sm text-muted-foreground">Total Price</span>
+                  <div className="flex items-baseline gap-2">
+                    <span className="text-2xl font-bold text-orange-500">
+                      ${selectedDish.price.toFixed(2)}
+                    </span>
+                    {selectedDish.originalPrice && (
+                      <span className="text-sm text-muted-foreground line-through">
+                        ${selectedDish.originalPrice.toFixed(2)}
+                      </span>
+                    )}
+                  </div>
+                </div>
+                <Button 
+                  className="bg-orange-500 hover:bg-orange-600"
+                  onClick={() => {
+                    handleOrderAgain(selectedDish)
+                    setIsDetailsOpen(false)
+                  }}
+                >
+                  <ShoppingCart className="h-4 w-4 mr-2" />
+                  Add to Cart
+                </Button>
               </div>
             </div>
           )}
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setIsDetailsOpen(false)}>
-              Close
-            </Button>
-            <Button 
-              className="bg-orange-500 hover:bg-orange-600"
-              onClick={() => {
-                handleOrderAgain(selectedDish)
-                setIsDetailsOpen(false)
-              }}
-            >
-              Order Again
-            </Button>
-          </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>
