@@ -81,7 +81,7 @@
 @layer utilities {
   /* Modern Glassmorphism */
   .glass {
-    @apply bg-white/70 backdrop-blur-xl border border-white/20;
+    @apply bg-white/70 dark:bg-gray-900/70 backdrop-blur-xl border border-white/20 dark:border-gray-700/30;
   }
   
   .glass-dark {
@@ -222,6 +222,10 @@
     border-radius: 1rem;
   }
 
+  .dark .gradient-border {
+    background: #1f2937;
+  }
+
   .gradient-border::before {
     content: '';
     position: absolute;
@@ -238,11 +242,11 @@
   }
 
   .scrollbar-thin::-webkit-scrollbar-track {
-    @apply bg-gray-100 rounded-full;
+    @apply bg-gray-100 dark:bg-gray-800 rounded-full;
   }
 
   .scrollbar-thin::-webkit-scrollbar-thumb {
-    @apply bg-gray-300 rounded-full hover:bg-gray-400;
+    @apply bg-gray-300 dark:bg-gray-600 rounded-full hover:bg-gray-400 dark:hover:bg-gray-500;
   }
 
   /* Mobile Touch Optimization */
@@ -301,6 +305,19 @@
 
 ::-webkit-scrollbar-thumb:hover {
   background: #9ca3af;
+}
+
+/* Dark mode scrollbar */
+.dark ::-webkit-scrollbar-track {
+  background: #1f2937;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: #4b5563;
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: #6b7280;
 }
 
 /* Focus visible styles */

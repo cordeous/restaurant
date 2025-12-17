@@ -187,11 +187,11 @@ export default function CategoriesPage() {
           <p className="text-muted-foreground text-sm sm:text-base">Manage your food categories</p>
         </div>
         <div className="flex items-center gap-2 sm:gap-3">
-          <div className="flex bg-gray-100 rounded-lg p-1">
+          <div className="flex bg-gray-100 dark:bg-gray-800 rounded-lg p-1">
             <Button
               variant="ghost"
               size="icon"
-              className={`h-8 w-8 ${viewMode === "grid" ? "bg-white shadow-sm" : ""}`}
+              className={`h-8 w-8 ${viewMode === "grid" ? "bg-white dark:bg-gray-700 shadow-sm" : ""}`}
               onClick={() => setViewMode("grid")}
             >
               <Grid className="h-4 w-4" />
@@ -199,7 +199,7 @@ export default function CategoriesPage() {
             <Button
               variant="ghost"
               size="icon"
-              className={`h-8 w-8 ${viewMode === "list" ? "bg-white shadow-sm" : ""}`}
+              className={`h-8 w-8 ${viewMode === "list" ? "bg-white dark:bg-gray-700 shadow-sm" : ""}`}
               onClick={() => setViewMode("list")}
             >
               <List className="h-4 w-4" />
@@ -292,7 +292,7 @@ export default function CategoriesPage() {
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
             placeholder="Search categories..."
-            className="pl-10 bg-white border-0 shadow-soft"
+            className="pl-10 bg-white dark:bg-gray-800 border border-gray-200/50 dark:border-gray-700/50 shadow-sm"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
@@ -300,7 +300,7 @@ export default function CategoriesPage() {
         
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="w-full sm:w-auto border-0 shadow-soft bg-white">
+            <Button variant="outline" className="w-full sm:w-auto border border-gray-200/50 dark:border-gray-700/50 shadow-sm bg-white dark:bg-gray-800">
               <Filter className="h-4 w-4 mr-2" />
               Filter
               {filterStatus !== "all" && (
@@ -333,7 +333,7 @@ export default function CategoriesPage() {
           {filteredCategories.map((category) => (
             <Card 
               key={category.id} 
-              className="overflow-hidden border-0 shadow-soft card-hover group"
+              className="overflow-hidden border border-gray-200/50 dark:border-gray-700/50 shadow-sm hover:shadow-lg card-hover group transition-all duration-300"
             >
               <div className="relative h-40 sm:h-48">
                 <FoodImage
@@ -413,7 +413,7 @@ export default function CategoriesPage() {
       ) : (
         <div className="space-y-3">
           {filteredCategories.map((category) => (
-            <Card key={category.id} className="overflow-hidden border-0 shadow-soft hover-lift">
+            <Card key={category.id} className="overflow-hidden border border-gray-200/50 dark:border-gray-700/50 shadow-sm hover:shadow-lg bg-white dark:bg-gray-800 transition-all duration-300">
               <CardContent className="p-3 sm:p-4 flex gap-4">
                 <div className="relative w-20 h-20 sm:w-24 sm:h-24 rounded-xl overflow-hidden flex-shrink-0">
                   <FoodImage
@@ -480,7 +480,7 @@ export default function CategoriesPage() {
 
       {filteredCategories.length === 0 && (
         <div className="text-center py-12">
-          <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gray-100 flex items-center justify-center">
+          <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
             <Search className="h-8 w-8 text-gray-400" />
           </div>
           <p className="text-muted-foreground">No categories found matching your criteria</p>

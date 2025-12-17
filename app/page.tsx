@@ -1,667 +1,484 @@
 "use client"
 
-import { useState } from "react"
-import { Card, CardContent } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { useState, useEffect } from "react"
+import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog"
-import Link from "next/link"
-import { ShoppingCart, Star, Clock, TrendingUp, Users, DollarSign, Flame, Heart, ChevronRight, Sparkles, Timer, Leaf } from "lucide-react"
-import { useToast } from "@/hooks/use-toast"
-import { FoodImage } from "@/components/food-image"
+import { 
+  ChefHat, 
+  ArrowRight, 
+  Store, 
+  Utensils, 
+  LineChart, 
+  Boxes, 
+  Bell, 
+  Settings,
+  Star,
+  Check,
+  Sparkles,
+  Users,
+  TrendingUp,
+  Shield,
+  Zap,
+  Clock,
+  ChevronRight,
+  Play,
+  Moon,
+  Sun
+} from "lucide-react"
+import { useTheme } from "next-themes"
 
-interface FoodItem {
-  id: string
-  name: string
-  description: string
-  time: string
-  image: string
-  category: "main" | "appetizer" | "dessert" | "beverage" | "ramen" | "katsu" | "salad" | "noodles"
-  price: number
-  originalPrice?: number
-  rating: number
-  reviews: number
-  status: "pending" | "delivered" | "finished"
-  calories?: number
-  prepTime?: string
-  ingredients?: string[]
-  spicyLevel?: number
-  isVegetarian?: boolean
-  isPopular?: boolean
-  isNew?: boolean
-}
+export default function LandingPage() {
+  const [mounted, setMounted] = useState(false)
+  const { setTheme, resolvedTheme } = useTheme()
 
-export default function HomePage() {
-  const { toast } = useToast()
-  const [cart, setCart] = useState<{ [key: string]: number }>({})
-  const [selectedDish, setSelectedDish] = useState<FoodItem | null>(null)
-  const [isDetailsOpen, setIsDetailsOpen] = useState(false)
-  const [favorites, setFavorites] = useState<string[]>([])
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
-  const categories = [
+  const features = [
     {
-      id: "1",
-      name: "Indonesian Cuisine",
-      description: "Traditional flavors with modern twist",
-      image: "/food/indonesian.jpg",
-      href: "/inventory",
-      items: 24,
-      popular: true,
-      category: "main" as const
+      icon: Store,
+      title: "Inventory Management",
+      description: "Track your ingredients, supplies, and stock levels in real-time with smart alerts.",
+      color: "from-blue-500 to-cyan-500"
     },
     {
-      id: "2",
-      name: "Japanese Delights",
-      description: "Authentic sushi & ramen",
-      image: "/food/japanese.jpg",
-      href: "/inventory",
-      items: 18,
-      popular: true,
-      category: "ramen" as const
-    },
-    {
-      id: "3",
-      name: "Korean BBQ",
-      description: "Grilled perfection",
-      image: "/food/korean.jpg",
-      href: "/inventory",
-      items: 15,
-      popular: false,
-      category: "main" as const
-    },
-    {
-      id: "4",
-      name: "Fresh Salads",
-      description: "Healthy & delicious",
-      image: "/food/salads.jpg",
-      href: "/inventory",
-      items: 12,
-      popular: false,
-      category: "salad" as const
-    }
-  ]
-
-  const [orders, setOrders] = useState<FoodItem[]>([
-    {
-      id: "1",
-      name: "Sambal Fried Fish",
-      description: "Crispy fried fish with spicy sambal sauce, served with fresh vegetables and steamed rice. A perfect blend of Indonesian spices.",
-      time: "7 Dec, 18:10",
-      image: "/food/sambal-fish.jpg",
-      category: "main",
-      price: 32.0,
-      originalPrice: 38.0,
-      rating: 4.8,
-      reviews: 234,
-      status: "pending",
-      calories: 580,
-      prepTime: "25 min",
-      ingredients: ["Fresh Fish", "Sambal", "Vegetables", "Rice"],
-      spicyLevel: 3,
-      isPopular: true
-    },
-    {
-      id: "2",
-      name: "Archipelago Noodles",
-      description: "Stir-fried noodles with chicken katsu, fresh vegetables, and our signature archipelago sauce. A fusion of flavors.",
-      time: "7 Dec, 18:10",
-      image: "/food/noodles.jpg",
-      category: "noodles",
-      price: 28.0,
-      rating: 4.9,
-      reviews: 189,
-      status: "pending",
-      calories: 720,
-      prepTime: "20 min",
-      ingredients: ["Egg Noodles", "Chicken", "Vegetables", "Special Sauce"],
-      spicyLevel: 2,
-      isNew: true
-    },
-    {
-      id: "3",
-      name: "Spicy Ramen Bowl",
-      description: "Rich tonkotsu broth with perfectly cooked noodles, chashu pork, soft-boiled egg, and fresh toppings.",
-      time: "6 Dec, 20:15",
-      image: "/food/ramen.jpg",
-      category: "ramen",
-      price: 24.0,
-      rating: 4.7,
-      reviews: 312,
-      status: "delivered",
-      calories: 650,
-      prepTime: "15 min",
-      ingredients: ["Ramen Noodles", "Pork", "Egg", "Nori", "Green Onion"],
-      spicyLevel: 4,
-      isPopular: true
-    },
-    {
-      id: "4",
-      name: "Chicken Katsu Curry",
-      description: "Crispy breaded chicken cutlet served with Japanese curry sauce and fluffy rice.",
-      time: "6 Dec, 19:30",
-      image: "/food/katsu.jpg",
-      category: "katsu",
-      price: 26.0,
-      rating: 4.6,
-      reviews: 156,
-      status: "delivered",
-      calories: 780,
-      prepTime: "30 min",
-      ingredients: ["Chicken Breast", "Panko", "Curry Sauce", "Rice"],
-      spicyLevel: 1
-    },
-    {
-      id: "5",
-      name: "Garden Fresh Salad",
-      description: "Mixed greens with cherry tomatoes, cucumber, avocado, and citrus vinaigrette dressing.",
-      time: "5 Dec, 12:00",
-      image: "/food/salad.jpg",
-      category: "salad",
-      price: 18.0,
-      rating: 4.5,
-      reviews: 98,
-      status: "finished",
-      calories: 280,
-      prepTime: "10 min",
-      ingredients: ["Mixed Greens", "Tomatoes", "Avocado", "Citrus Dressing"],
-      isVegetarian: true
-    }
-  ])
-
-  const quickStats = [
-    {
-      title: "Today's Revenue",
-      value: "$1,234",
-      icon: DollarSign,
-      change: "+12%",
-      color: "from-green-500 to-emerald-600"
-    },
-    {
-      title: "Active Orders",
-      value: "24",
-      icon: ShoppingCart,
-      change: "+5",
-      color: "from-blue-500 to-indigo-600"
-    },
-    {
-      title: "Total Customers",
-      value: "892",
-      icon: Users,
-      change: "+18%",
-      color: "from-purple-500 to-violet-600"
-    },
-    {
-      title: "Popular Items",
-      value: "12",
-      icon: TrendingUp,
-      change: "+3",
+      icon: Utensils,
+      title: "Recipe Builder",
+      description: "Create, organize, and cost your recipes with automatic ingredient calculations.",
       color: "from-orange-500 to-red-500"
+    },
+    {
+      icon: LineChart,
+      title: "Analytics Dashboard",
+      description: "Get insights into sales, popular items, and trends to make data-driven decisions.",
+      color: "from-purple-500 to-pink-500"
+    },
+    {
+      icon: Boxes,
+      title: "Order Management",
+      description: "Handle orders efficiently from placement to delivery with status tracking.",
+      color: "from-green-500 to-emerald-500"
+    },
+    {
+      icon: Bell,
+      title: "Smart Alerts",
+      description: "Never run out of stock with intelligent notifications and reorder reminders.",
+      color: "from-amber-500 to-orange-500"
+    },
+    {
+      icon: Settings,
+      title: "Customizable Settings",
+      description: "Configure the system to match your restaurant's unique workflow and needs.",
+      color: "from-slate-500 to-gray-600"
     }
   ]
 
-  const handleOrderAgain = (order: FoodItem) => {
-    toast({
-      title: "Added to Cart! 🛒",
-      description: `${order.name} has been added to your cart.`,
-    })
-    setCart(prev => ({
-      ...prev,
-      [order.id]: (prev[order.id] || 0) + 1
-    }))
-  }
+  const stats = [
+    { value: "10K+", label: "Active Users", icon: Users },
+    { value: "50M+", label: "Orders Managed", icon: TrendingUp },
+    { value: "99.9%", label: "Uptime", icon: Shield },
+    { value: "< 1s", label: "Response Time", icon: Zap }
+  ]
 
-  const handleViewDetails = (order: FoodItem) => {
-    setSelectedDish(order)
-    setIsDetailsOpen(true)
-  }
-
-  const toggleFavorite = (id: string) => {
-    setFavorites(prev => 
-      prev.includes(id) ? prev.filter(f => f !== id) : [...prev, id]
-    )
-    toast({
-      title: favorites.includes(id) ? "Removed from favorites" : "Added to favorites ❤️",
-      description: favorites.includes(id) ? "Item removed from your favorites" : "You can find this in your favorites",
-    })
-  }
-
-  const moveToDelivered = (orderId: string) => {
-    setOrders(orders.map(order => 
-      order.id === orderId ? { ...order, status: "delivered" } : order
-    ))
-    toast({
-      title: "Order Delivered! 🎉",
-      description: "Order has been marked as delivered.",
-    })
-  }
-
-  const moveToFinished = (orderId: string) => {
-    setOrders(orders.map(order => 
-      order.id === orderId ? { ...order, status: "finished" } : order
-    ))
-    toast({
-      title: "Order Completed! ✅",
-      description: "Order has been marked as finished.",
-    })
-  }
-
-  const renderSpicyLevel = (level: number) => {
-    return (
-      <div className="flex items-center gap-0.5">
-        {[1, 2, 3, 4, 5].map((i) => (
-          <Flame 
-            key={i} 
-            className={`h-3 w-3 ${i <= level ? 'text-red-500 fill-red-500' : 'text-gray-300'}`} 
-          />
-        ))}
-      </div>
-    )
-  }
+  const testimonials = [
+    {
+      name: "Sarah Chen",
+      role: "Owner, Fusion Kitchen",
+      content: "FoodHealth transformed how we manage our restaurant. Inventory tracking alone saves us 10 hours per week!",
+      rating: 5
+    },
+    {
+      name: "Marcus Rodriguez",
+      role: "Head Chef, La Mesa",
+      content: "The recipe builder is a game-changer. I can cost dishes instantly and adjust portions with ease.",
+      rating: 5
+    },
+    {
+      name: "Emily Watson",
+      role: "Manager, The Garden Café",
+      content: "Best investment we made. The analytics helped us identify our most profitable items.",
+      rating: 5
+    }
+  ]
 
   return (
-    <div className="flex-1 space-y-6 sm:space-y-8">
-      {/* Hero Banner */}
-      <div className="relative overflow-hidden rounded-2xl sm:rounded-3xl mx-2 sm:mx-0">
-        <div className="absolute inset-0 bg-gradient-to-r from-orange-500 via-orange-400 to-yellow-400" />
-        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4xIj48cGF0aCBkPSJNMzYgMzRjMC0yLjIxLTEuNzktNC00LTRzLTQgMS43OS00IDQgMS43OSA0IDQgNCA0LTEuNzkgNC00eiIvPjwvZz48L2c+PC9zdmc+')] opacity-30" />
-        <div className="relative px-4 sm:px-8 py-8 sm:py-12 flex flex-col md:flex-row items-center justify-between gap-6">
-          <div className="space-y-3 sm:space-y-4 text-center md:text-left flex-1">
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-white/20 backdrop-blur-sm rounded-full text-white text-sm">
-              <Sparkles className="h-4 w-4" />
-              <span>Special Offer</span>
-            </div>
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white leading-tight">
-              Discount New Menu!
-            </h2>
-            <p className="text-orange-100 text-base sm:text-lg max-w-md">
-              Get Free Shipping Every $20 With No Minimum Purchase. Limited time offer!
-            </p>
-            <div className="flex flex-col sm:flex-row gap-3 justify-center md:justify-start">
-              <Button size="lg" className="bg-white text-orange-500 hover:bg-orange-50 shadow-lg shadow-orange-600/30 hover:shadow-xl transition-all duration-300 hover:-translate-y-0.5">
-                Order Now
-                <ChevronRight className="ml-1 h-4 w-4" />
-              </Button>
-              <Button size="lg" variant="outline" className="border-white/30 text-white hover:bg-white/20 backdrop-blur-sm">
-                View Menu
-              </Button>
-            </div>
-          </div>
-          <div className="hidden md:block w-64 lg:w-80 h-48 lg:h-56 relative animate-float">
-            <FoodImage 
-              alt="Food Banner"
-              category="main"
-              className="rounded-2xl shadow-2xl"
-            />
-          </div>
-        </div>
-      </div>
-
-      {/* Quick Stats - Horizontal Scroll on Mobile */}
-      <div className="px-2 sm:px-0">
-        <div className="flex gap-3 sm:gap-4 overflow-x-auto pb-2 sm:pb-0 sm:grid sm:grid-cols-2 lg:grid-cols-4 scrollbar-thin">
-          {quickStats.map((stat, index) => {
-            const Icon = stat.icon
-            return (
-              <Card 
-                key={stat.title} 
-                className={`min-w-[160px] sm:min-w-0 hover-lift cursor-pointer border-0 shadow-soft animate-slide-up`}
-                style={{ animationDelay: `${index * 100}ms` }}
-              >
-                <CardContent className="p-4 sm:p-6">
-                  <div className="flex items-center justify-between">
-                    <div className="space-y-1">
-                      <p className="text-xs sm:text-sm text-muted-foreground">{stat.title}</p>
-                      <p className="text-xl sm:text-2xl font-bold">{stat.value}</p>
-                      <p className="text-xs sm:text-sm text-green-500 font-medium">{stat.change}</p>
-                    </div>
-                    <div className={`h-10 w-10 sm:h-12 sm:w-12 rounded-xl bg-gradient-to-br ${stat.color} flex items-center justify-center shadow-lg`}>
-                      <Icon className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            )
-          })}
-        </div>
-      </div>
-
-      {/* Categories Section */}
-      <div className="space-y-4 px-2 sm:px-0">
-        <div className="flex justify-between items-center">
-          <div>
-            <h2 className="text-xl sm:text-2xl font-bold">Categories</h2>
-            <p className="text-sm text-muted-foreground hidden sm:block">Explore our food categories</p>
-          </div>
-          <Link href="/inventory" className="text-orange-500 hover:text-orange-600 font-medium text-sm flex items-center gap-1 transition-colors">
-            See all
-            <ChevronRight className="h-4 w-4" />
-          </Link>
-        </div>
-        
-        {/* Horizontal scroll on mobile, grid on larger screens */}
-        <div className="flex gap-3 sm:gap-4 overflow-x-auto pb-2 sm:pb-0 sm:grid sm:grid-cols-2 lg:grid-cols-4 scrollbar-thin stagger-children">
-          {categories.map((category) => (
-            <Link href={category.href} key={category.id} className="block min-w-[200px] sm:min-w-0">
-              <Card className="overflow-hidden card-hover group border-0 shadow-soft h-full">
-                <div className="relative h-32 sm:h-40">
-                  <FoodImage
-                    src={category.image}
-                    alt={category.name}
-                    category={category.category}
-                    className="group-hover:scale-110 transition-transform duration-500"
-                  />
-                  {category.popular && (
-                    <Badge className="absolute top-2 right-2 bg-gradient-to-r from-orange-500 to-red-500 border-0 shadow-lg">
-                      🔥 Popular
-                    </Badge>
-                  )}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
-                  <div className="absolute bottom-0 left-0 right-0 p-3 sm:p-4 text-white">
-                    <h3 className="font-semibold text-base sm:text-lg">{category.name}</h3>
-                    <p className="text-xs sm:text-sm text-white/80 line-clamp-1">{category.description}</p>
-                    <p className="text-xs text-white/60 mt-1">{category.items} items</p>
-                  </div>
-                </div>
-              </Card>
+    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white dark:from-gray-950 dark:to-gray-900">
+      {/* Navigation */}
+      <nav className="fixed top-0 left-0 right-0 z-50 bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl border-b border-gray-200/50 dark:border-gray-800/50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16">
+            <Link href="/" className="flex items-center gap-2 group">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-400 to-orange-600 flex items-center justify-center shadow-lg shadow-orange-500/30 group-hover:shadow-orange-500/50 transition-all duration-300">
+                <ChefHat className="h-5 w-5 text-white" />
+              </div>
+              <span className="font-bold text-xl bg-gradient-to-r from-orange-500 to-orange-600 bg-clip-text text-transparent">
+                FoodHealth
+              </span>
             </Link>
-          ))}
-        </div>
-      </div>
-
-      {/* Recent Orders Section */}
-      <div className="space-y-4 px-2 sm:px-0">
-        <div className="flex justify-between items-center">
-          <div>
-            <h2 className="text-xl sm:text-2xl font-bold">Recent Orders</h2>
-            <p className="text-sm text-muted-foreground hidden sm:block">Track and manage your orders</p>
-          </div>
-          {Object.keys(cart).length > 0 && (
-            <Badge variant="secondary" className="px-3 py-1.5 bg-orange-100 text-orange-600">
-              <ShoppingCart className="h-3 w-3 mr-1.5" />
-              {Object.values(cart).reduce((a, b) => a + b, 0)} items
-            </Badge>
-          )}
-        </div>
-        
-        <Tabs defaultValue="pending" className="w-full">
-          <TabsList className="w-full sm:w-auto grid grid-cols-3 h-auto p-1 bg-gray-100/80">
-            <TabsTrigger value="pending" className="text-xs sm:text-sm py-2 data-[state=active]:bg-white data-[state=active]:shadow-sm">
-              Pending ({orders.filter(o => o.status === "pending").length})
-            </TabsTrigger>
-            <TabsTrigger value="delivered" className="text-xs sm:text-sm py-2 data-[state=active]:bg-white data-[state=active]:shadow-sm">
-              Delivered ({orders.filter(o => o.status === "delivered").length})
-            </TabsTrigger>
-            <TabsTrigger value="finished" className="text-xs sm:text-sm py-2 data-[state=active]:bg-white data-[state=active]:shadow-sm">
-              Finished ({orders.filter(o => o.status === "finished").length})
-            </TabsTrigger>
-          </TabsList>
-          
-          {["pending", "delivered", "finished"].map(status => (
-            <TabsContent key={status} value={status} className="space-y-3 sm:space-y-4 mt-4">
-              {orders.filter(order => order.status === status).map((order, index) => (
-                <Card 
-                  key={order.id} 
-                  className={`overflow-hidden border-0 shadow-soft hover-lift animate-slide-up ${status === "finished" ? "opacity-70" : ""}`}
-                  style={{ animationDelay: `${index * 100}ms` }}
-                >
-                  <CardContent className="p-3 sm:p-4">
-                    <div className="flex gap-3 sm:gap-4">
-                      {/* Food Image */}
-                      <div 
-                        className="relative w-20 h-20 sm:w-24 sm:h-24 rounded-xl overflow-hidden flex-shrink-0 cursor-pointer group"
-                        onClick={() => handleViewDetails(order)}
-                      >
-                        <FoodImage
-                          src={order.image}
-                          alt={order.name}
-                          category={order.category}
-                          className="group-hover:scale-110 transition-transform duration-300"
-                        />
-                        {order.originalPrice && (
-                          <Badge className="absolute top-1 left-1 bg-red-500 text-[10px] px-1.5 py-0.5">
-                            Sale
-                          </Badge>
-                        )}
-                      </div>
-
-                      {/* Content */}
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-start justify-between gap-2">
-                          <div className="min-w-0 flex-1">
-                            <div className="flex items-center gap-2 flex-wrap">
-                              <h3 className="font-semibold text-sm sm:text-base line-clamp-1">{order.name}</h3>
-                              {order.isNew && (
-                                <Badge variant="secondary" className="bg-blue-100 text-blue-600 text-[10px] px-1.5">New</Badge>
-                              )}
-                              {order.isPopular && (
-                                <Badge variant="secondary" className="bg-orange-100 text-orange-600 text-[10px] px-1.5">Popular</Badge>
-                              )}
-                            </div>
-                            <p className="text-xs sm:text-sm text-muted-foreground line-clamp-2 mt-0.5">
-                              {order.description}
-                            </p>
-                          </div>
-                          <button 
-                            onClick={() => toggleFavorite(order.id)}
-                            className="p-1.5 rounded-full hover:bg-gray-100 transition-colors flex-shrink-0"
-                          >
-                            <Heart className={`h-4 w-4 sm:h-5 sm:w-5 transition-colors ${favorites.includes(order.id) ? 'fill-red-500 text-red-500' : 'text-gray-400'}`} />
-                          </button>
-                        </div>
-
-                        {/* Stats Row */}
-                        <div className="flex items-center gap-2 sm:gap-3 mt-2 flex-wrap">
-                          <div className="flex items-center gap-1">
-                            <Star className="h-3 w-3 sm:h-4 sm:w-4 fill-yellow-400 text-yellow-400" />
-                            <span className="text-xs sm:text-sm font-medium">{order.rating}</span>
-                            <span className="text-xs text-muted-foreground">({order.reviews})</span>
-                          </div>
-                          {order.prepTime && (
-                            <div className="flex items-center gap-1 text-muted-foreground">
-                              <Timer className="h-3 w-3" />
-                              <span className="text-xs">{order.prepTime}</span>
-                            </div>
-                          )}
-                          {order.calories && (
-                            <span className="text-xs text-muted-foreground">{order.calories} cal</span>
-                          )}
-                          {order.spicyLevel && order.spicyLevel > 0 && (
-                            <div className="hidden sm:block">{renderSpicyLevel(order.spicyLevel)}</div>
-                          )}
-                          {order.isVegetarian && (
-                            <Badge variant="outline" className="text-green-600 border-green-200 text-[10px] px-1.5 py-0">
-                              <Leaf className="h-2.5 w-2.5 mr-0.5" />
-                              Veg
-                            </Badge>
-                          )}
-                        </div>
-
-                        {/* Price & Actions */}
-                        <div className="flex items-center justify-between mt-3 gap-2">
-                          <div className="flex items-baseline gap-2">
-                            <span className="font-bold text-base sm:text-lg text-orange-500">${order.price.toFixed(2)}</span>
-                            {order.originalPrice && (
-                              <span className="text-xs sm:text-sm text-muted-foreground line-through">${order.originalPrice.toFixed(2)}</span>
-                            )}
-                          </div>
-                          <div className="flex items-center gap-2">
-                            {status === "pending" && (
-                              <>
-                                <Button
-                                  variant="outline"
-                                  size="sm"
-                                  className="text-xs h-8 hidden sm:flex"
-                                  onClick={() => handleViewDetails(order)}
-                                >
-                                  View
-                                </Button>
-                                <Button
-                                  size="sm"
-                                  className="text-xs h-8 bg-orange-500 hover:bg-orange-600"
-                                  onClick={() => moveToDelivered(order.id)}
-                                >
-                                  Delivered
-                                </Button>
-                              </>
-                            )}
-                            {status === "delivered" && (
-                              <>
-                                <Button
-                                  variant="outline"
-                                  size="sm"
-                                  className="text-xs h-8"
-                                  onClick={() => handleOrderAgain(order)}
-                                >
-                                  Reorder
-                                </Button>
-                                <Button
-                                  size="sm"
-                                  className="text-xs h-8 bg-green-500 hover:bg-green-600"
-                                  onClick={() => moveToFinished(order.id)}
-                                >
-                                  Complete
-                                </Button>
-                              </>
-                            )}
-                            {status === "finished" && (
-                              <Button
-                                size="sm"
-                                className="text-xs h-8 bg-orange-500 hover:bg-orange-600"
-                                onClick={() => handleOrderAgain(order)}
-                              >
-                                Order Again
-                              </Button>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-              
-              {orders.filter(o => o.status === status).length === 0 && (
-                <div className="text-center py-12 px-4">
-                  <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gray-100 flex items-center justify-center">
-                    <ShoppingCart className="h-8 w-8 text-gray-400" />
-                  </div>
-                  <p className="text-muted-foreground">No {status} orders</p>
-                </div>
-              )}
-            </TabsContent>
-          ))}
-        </Tabs>
-      </div>
-
-      {/* Food Details Dialog */}
-      <Dialog open={isDetailsOpen} onOpenChange={setIsDetailsOpen}>
-        <DialogContent className="max-w-lg sm:max-w-2xl max-h-[90vh] overflow-y-auto p-0">
-          <div className="relative h-48 sm:h-64">
-            {selectedDish && (
-              <FoodImage
-                src={selectedDish.image}
-                alt={selectedDish.name}
-                category={selectedDish.category}
-              />
-            )}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-            <div className="absolute bottom-4 left-4 right-4 text-white">
-              <h3 className="text-xl sm:text-2xl font-bold">{selectedDish?.name}</h3>
-              <div className="flex items-center gap-3 mt-2">
-                <div className="flex items-center gap-1">
-                  <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                  <span className="font-medium">{selectedDish?.rating}</span>
-                  <span className="text-white/70 text-sm">({selectedDish?.reviews} reviews)</span>
-                </div>
-              </div>
+            
+            <div className="hidden md:flex items-center gap-8">
+              <a href="#features" className="text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-orange-500 dark:hover:text-orange-400 transition-colors">Features</a>
+              <a href="#testimonials" className="text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-orange-500 dark:hover:text-orange-400 transition-colors">Testimonials</a>
+              <a href="#pricing" className="text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-orange-500 dark:hover:text-orange-400 transition-colors">Pricing</a>
             </div>
-            <button 
-              onClick={() => selectedDish && toggleFavorite(selectedDish.id)}
-              className="absolute top-4 right-4 p-2 rounded-full bg-white/20 backdrop-blur-sm hover:bg-white/30 transition-colors"
-            >
-              <Heart className={`h-5 w-5 ${selectedDish && favorites.includes(selectedDish.id) ? 'fill-red-500 text-red-500' : 'text-white'}`} />
-            </button>
-          </div>
-          
-          {selectedDish && (
-            <div className="p-4 sm:p-6 space-y-4">
-              <p className="text-muted-foreground">{selectedDish.description}</p>
-              
-              {/* Quick Info */}
-              <div className="grid grid-cols-3 gap-3">
-                {selectedDish.prepTime && (
-                  <div className="text-center p-3 bg-gray-50 rounded-xl">
-                    <Timer className="h-5 w-5 mx-auto text-orange-500" />
-                    <p className="text-xs text-muted-foreground mt-1">Prep Time</p>
-                    <p className="font-medium text-sm">{selectedDish.prepTime}</p>
-                  </div>
-                )}
-                {selectedDish.calories && (
-                  <div className="text-center p-3 bg-gray-50 rounded-xl">
-                    <Flame className="h-5 w-5 mx-auto text-orange-500" />
-                    <p className="text-xs text-muted-foreground mt-1">Calories</p>
-                    <p className="font-medium text-sm">{selectedDish.calories}</p>
-                  </div>
-                )}
-                {selectedDish.spicyLevel !== undefined && (
-                  <div className="text-center p-3 bg-gray-50 rounded-xl">
-                    <div className="flex justify-center">{renderSpicyLevel(selectedDish.spicyLevel)}</div>
-                    <p className="text-xs text-muted-foreground mt-1">Spicy Level</p>
-                    <p className="font-medium text-sm">{selectedDish.spicyLevel}/5</p>
-                  </div>
-                )}
-              </div>
 
-              {/* Ingredients */}
-              {selectedDish.ingredients && (
-                <div>
-                  <h4 className="font-medium mb-2">Ingredients</h4>
-                  <div className="flex flex-wrap gap-2">
-                    {selectedDish.ingredients.map((ing, idx) => (
-                      <Badge key={idx} variant="secondary" className="px-3 py-1">{ing}</Badge>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Price Section */}
-              <div className="flex items-center justify-between p-4 bg-orange-50 rounded-xl">
-                <div>
-                  <span className="text-sm text-muted-foreground">Total Price</span>
-                  <div className="flex items-baseline gap-2">
-                    <span className="text-2xl font-bold text-orange-500">
-                      ${selectedDish.price.toFixed(2)}
-                    </span>
-                    {selectedDish.originalPrice && (
-                      <span className="text-sm text-muted-foreground line-through">
-                        ${selectedDish.originalPrice.toFixed(2)}
-                      </span>
-                    )}
-                  </div>
-                </div>
-                <Button 
-                  className="bg-orange-500 hover:bg-orange-600"
-                  onClick={() => {
-                    handleOrderAgain(selectedDish)
-                    setIsDetailsOpen(false)
-                  }}
-                >
-                  <ShoppingCart className="h-4 w-4 mr-2" />
-                  Add to Cart
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
+                className="p-2 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 transition-all duration-300"
+                aria-label="Toggle theme"
+              >
+                {mounted && (
+                  resolvedTheme === "dark" ? (
+                    <Sun className="h-5 w-5 text-amber-500" />
+                  ) : (
+                    <Moon className="h-5 w-5 text-gray-600" />
+                  )
+                )}
+              </button>
+              <Link href="/dashboard">
+                <Button className="bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 shadow-lg shadow-orange-500/30 hover:shadow-orange-500/50 transition-all duration-300">
+                  Get Started
+                  <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
+              </Link>
+            </div>
+          </div>
+        </div>
+      </nav>
+
+      {/* Hero Section */}
+      <section className="relative pt-32 pb-20 px-4 sm:px-6 lg:px-8 overflow-hidden">
+        {/* Background Elements */}
+        <div className="absolute inset-0 overflow-hidden">
+          <div className="absolute -top-40 -right-40 w-80 h-80 bg-orange-400/20 dark:bg-orange-500/10 rounded-full blur-3xl" />
+          <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-orange-300/20 dark:bg-orange-600/10 rounded-full blur-3xl" />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-gradient-to-r from-orange-200/30 to-yellow-200/30 dark:from-orange-900/20 dark:to-yellow-900/20 rounded-full blur-3xl" />
+        </div>
+
+        <div className="relative max-w-7xl mx-auto">
+          <div className="text-center max-w-4xl mx-auto">
+            <Badge className="mb-6 px-4 py-2 bg-orange-100 dark:bg-orange-500/20 text-orange-600 dark:text-orange-400 border-0 text-sm font-medium">
+              <Sparkles className="h-4 w-4 mr-2" />
+              #1 Restaurant Management Platform
+            </Badge>
+            
+            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight">
+              <span className="text-gray-900 dark:text-white">Manage Your</span>
+              <br />
+              <span className="bg-gradient-to-r from-orange-500 via-orange-600 to-red-500 bg-clip-text text-transparent">
+                Restaurant Smarter
+              </span>
+            </h1>
+            
+            <p className="mt-6 text-lg sm:text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto leading-relaxed">
+              The all-in-one platform to manage inventory, track orders, build recipes, and grow your restaurant business with powerful analytics.
+            </p>
+
+            <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
+              <Link href="/dashboard">
+                <Button size="lg" className="w-full sm:w-auto px-8 py-6 text-lg bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 shadow-xl shadow-orange-500/30 hover:shadow-orange-500/50 transition-all duration-300 hover:-translate-y-1">
+                  Start Free Trial
+                  <ArrowRight className="ml-2 h-5 w-5" />
+                </Button>
+              </Link>
+              <Button size="lg" variant="outline" className="w-full sm:w-auto px-8 py-6 text-lg border-2 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800">
+                <Play className="mr-2 h-5 w-5" />
+                Watch Demo
+              </Button>
+            </div>
+
+            <p className="mt-6 text-sm text-gray-500 dark:text-gray-400">
+              No credit card required • Free 14-day trial • Cancel anytime
+            </p>
+          </div>
+
+          {/* Hero Image/Dashboard Preview */}
+          <div className="mt-16 relative">
+            <div className="absolute inset-0 bg-gradient-to-t from-gray-50 dark:from-gray-950 via-transparent to-transparent z-10 pointer-events-none" />
+            <div className="relative mx-auto max-w-5xl">
+              <div className="rounded-2xl bg-white dark:bg-gray-800 shadow-2xl shadow-gray-900/10 dark:shadow-black/30 border border-gray-200 dark:border-gray-700 overflow-hidden">
+                <div className="p-1 bg-gray-100 dark:bg-gray-700 flex items-center gap-2">
+                  <div className="flex gap-1.5 ml-2">
+                    <div className="w-3 h-3 rounded-full bg-red-500" />
+                    <div className="w-3 h-3 rounded-full bg-yellow-500" />
+                    <div className="w-3 h-3 rounded-full bg-green-500" />
+                  </div>
+                  <div className="flex-1 text-center text-xs text-gray-500 dark:text-gray-400">FoodHealth Dashboard</div>
+                </div>
+                <div className="aspect-[16/9] bg-gradient-to-br from-orange-50 to-orange-100 dark:from-gray-800 dark:to-gray-900 flex items-center justify-center relative overflow-hidden">
+                  {/* Mock Dashboard Preview */}
+                  <div className="absolute inset-4 grid grid-cols-4 gap-4">
+                    <div className="col-span-3 space-y-4">
+                      <div className="h-16 bg-white dark:bg-gray-700 rounded-xl shadow-sm animate-pulse" />
+                      <div className="grid grid-cols-4 gap-4">
+                        {[1, 2, 3, 4].map((i) => (
+                          <div key={i} className="h-24 bg-white dark:bg-gray-700 rounded-xl shadow-sm" />
+                        ))}
+                      </div>
+                      <div className="h-48 bg-white dark:bg-gray-700 rounded-xl shadow-sm" />
+                    </div>
+                    <div className="space-y-4">
+                      <div className="h-32 bg-white dark:bg-gray-700 rounded-xl shadow-sm" />
+                      <div className="h-32 bg-white dark:bg-gray-700 rounded-xl shadow-sm" />
+                      <div className="h-32 bg-white dark:bg-gray-700 rounded-xl shadow-sm" />
+                    </div>
+                  </div>
+                  <div className="absolute inset-0 flex items-center justify-center bg-black/5 dark:bg-black/20">
+                    <div className="text-center">
+                      <div className="w-20 h-20 mx-auto rounded-2xl bg-gradient-to-br from-orange-400 to-orange-600 flex items-center justify-center shadow-xl mb-4">
+                        <ChefHat className="h-10 w-10 text-white" />
+                      </div>
+                      <p className="text-gray-600 dark:text-gray-300 font-medium">Interactive Dashboard</p>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
-          )}
-        </DialogContent>
-      </Dialog>
+          </div>
+        </div>
+      </section>
+
+      {/* Stats Section */}
+      <section className="py-16 px-4 sm:px-6 lg:px-8 bg-white dark:bg-gray-900 border-y border-gray-100 dark:border-gray-800">
+        <div className="max-w-7xl mx-auto">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
+            {stats.map((stat, index) => {
+              const Icon = stat.icon
+              return (
+                <div key={index} className="text-center">
+                  <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-orange-100 dark:bg-orange-500/20 mb-4">
+                    <Icon className="h-6 w-6 text-orange-600 dark:text-orange-400" />
+                  </div>
+                  <div className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white">{stat.value}</div>
+                  <div className="text-sm text-gray-500 dark:text-gray-400 mt-1">{stat.label}</div>
+                </div>
+              )
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* Features Section */}
+      <section id="features" className="py-24 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center max-w-3xl mx-auto mb-16">
+            <Badge className="mb-4 px-3 py-1 bg-orange-100 dark:bg-orange-500/20 text-orange-600 dark:text-orange-400 border-0">
+              Features
+            </Badge>
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 dark:text-white">
+              Everything you need to run your restaurant
+            </h2>
+            <p className="mt-4 text-lg text-gray-600 dark:text-gray-300">
+              Powerful tools designed specifically for restaurant management, all in one place.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
+            {features.map((feature, index) => {
+              const Icon = feature.icon
+              return (
+                <div
+                  key={index}
+                  className="group relative p-6 lg:p-8 rounded-2xl bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
+                >
+                  <div className={`w-14 h-14 rounded-xl bg-gradient-to-br ${feature.color} flex items-center justify-center mb-5 shadow-lg group-hover:scale-110 transition-transform duration-300`}>
+                    <Icon className="h-7 w-7 text-white" />
+                  </div>
+                  <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">
+                    {feature.title}
+                  </h3>
+                  <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
+                    {feature.description}
+                  </p>
+                  <ChevronRight className="absolute top-6 right-6 h-5 w-5 text-gray-300 dark:text-gray-600 group-hover:text-orange-500 group-hover:translate-x-1 transition-all duration-300" />
+                </div>
+              )
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* Testimonials Section */}
+      <section id="testimonials" className="py-24 px-4 sm:px-6 lg:px-8 bg-gray-50 dark:bg-gray-900/50">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center max-w-3xl mx-auto mb-16">
+            <Badge className="mb-4 px-3 py-1 bg-orange-100 dark:bg-orange-500/20 text-orange-600 dark:text-orange-400 border-0">
+              Testimonials
+            </Badge>
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 dark:text-white">
+              Loved by restaurant owners
+            </h2>
+            <p className="mt-4 text-lg text-gray-600 dark:text-gray-300">
+              See what our customers have to say about FoodHealth.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-6 lg:gap-8">
+            {testimonials.map((testimonial, index) => (
+              <div
+                key={index}
+                className="p-6 lg:p-8 rounded-2xl bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 shadow-sm"
+              >
+                <div className="flex gap-1 mb-4">
+                  {[...Array(testimonial.rating)].map((_, i) => (
+                    <Star key={i} className="h-5 w-5 fill-yellow-400 text-yellow-400" />
+                  ))}
+                </div>
+                <p className="text-gray-600 dark:text-gray-300 mb-6 leading-relaxed">
+                  "{testimonial.content}"
+                </p>
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-orange-400 to-orange-600 flex items-center justify-center text-white font-semibold">
+                    {testimonial.name.charAt(0)}
+                  </div>
+                  <div>
+                    <p className="font-semibold text-gray-900 dark:text-white">{testimonial.name}</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">{testimonial.role}</p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Pricing Section */}
+      <section id="pricing" className="py-24 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center max-w-3xl mx-auto mb-16">
+            <Badge className="mb-4 px-3 py-1 bg-orange-100 dark:bg-orange-500/20 text-orange-600 dark:text-orange-400 border-0">
+              Pricing
+            </Badge>
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 dark:text-white">
+              Simple, transparent pricing
+            </h2>
+            <p className="mt-4 text-lg text-gray-600 dark:text-gray-300">
+              Start free, upgrade when you need more.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+            {/* Free Plan */}
+            <div className="p-8 rounded-2xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-sm">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Starter</h3>
+              <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Perfect for small restaurants</p>
+              <div className="mt-6">
+                <span className="text-4xl font-bold text-gray-900 dark:text-white">$0</span>
+                <span className="text-gray-500 dark:text-gray-400">/month</span>
+              </div>
+              <ul className="mt-6 space-y-3">
+                {["Up to 50 menu items", "Basic inventory tracking", "Order management", "Email support"].map((feature, i) => (
+                  <li key={i} className="flex items-center gap-3 text-gray-600 dark:text-gray-300">
+                    <Check className="h-5 w-5 text-green-500 flex-shrink-0" />
+                    <span>{feature}</span>
+                  </li>
+                ))}
+              </ul>
+              <Link href="/dashboard" className="block mt-8">
+                <Button variant="outline" className="w-full dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700">
+                  Get Started
+                </Button>
+              </Link>
+            </div>
+
+            {/* Pro Plan */}
+            <div className="relative p-8 rounded-2xl bg-gradient-to-br from-orange-500 to-orange-600 shadow-xl shadow-orange-500/30 scale-105">
+              <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 bg-white text-orange-600 shadow-lg">
+                Most Popular
+              </Badge>
+              <h3 className="text-lg font-semibold text-white">Professional</h3>
+              <p className="text-sm text-orange-100 mt-1">For growing restaurants</p>
+              <div className="mt-6">
+                <span className="text-4xl font-bold text-white">$49</span>
+                <span className="text-orange-100">/month</span>
+              </div>
+              <ul className="mt-6 space-y-3">
+                {["Unlimited menu items", "Advanced analytics", "Recipe costing", "Multi-location support", "Priority support"].map((feature, i) => (
+                  <li key={i} className="flex items-center gap-3 text-white">
+                    <Check className="h-5 w-5 text-orange-200 flex-shrink-0" />
+                    <span>{feature}</span>
+                  </li>
+                ))}
+              </ul>
+              <Link href="/dashboard" className="block mt-8">
+                <Button className="w-full bg-white text-orange-600 hover:bg-orange-50">
+                  Start Free Trial
+                </Button>
+              </Link>
+            </div>
+
+            {/* Enterprise Plan */}
+            <div className="p-8 rounded-2xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-sm">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Enterprise</h3>
+              <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">For restaurant chains</p>
+              <div className="mt-6">
+                <span className="text-4xl font-bold text-gray-900 dark:text-white">Custom</span>
+              </div>
+              <ul className="mt-6 space-y-3">
+                {["Everything in Pro", "Custom integrations", "Dedicated account manager", "SLA guarantee", "On-premise option"].map((feature, i) => (
+                  <li key={i} className="flex items-center gap-3 text-gray-600 dark:text-gray-300">
+                    <Check className="h-5 w-5 text-green-500 flex-shrink-0" />
+                    <span>{feature}</span>
+                  </li>
+                ))}
+              </ul>
+              <Button variant="outline" className="w-full mt-8 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700">
+                Contact Sales
+              </Button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Section */}
+      <section className="py-24 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-4xl mx-auto">
+          <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-orange-500 via-orange-600 to-red-500 p-8 sm:p-12 lg:p-16">
+            <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4xIj48cGF0aCBkPSJNMzYgMzRjMC0yLjIxLTEuNzktNC00LTRzLTQgMS43OS00IDQgMS43OSA0IDQgNCA0LTEuNzkgNC00eiIvPjwvZz48L2c+PC9zdmc+')] opacity-30" />
+            <div className="relative text-center">
+              <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-4">
+                Ready to transform your restaurant?
+              </h2>
+              <p className="text-lg sm:text-xl text-orange-100 mb-8 max-w-2xl mx-auto">
+                Join thousands of restaurant owners who are already saving time and growing their business with FoodHealth.
+              </p>
+              <Link href="/dashboard">
+                <Button size="lg" className="px-8 py-6 text-lg bg-white text-orange-600 hover:bg-orange-50 shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-1">
+                  Start Your Free Trial
+                  <ArrowRight className="ml-2 h-5 w-5" />
+                </Button>
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="py-12 px-4 sm:px-6 lg:px-8 border-t border-gray-200 dark:border-gray-800">
+        <div className="max-w-7xl mx-auto">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+            <div className="flex items-center gap-2">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-400 to-orange-600 flex items-center justify-center">
+                <ChefHat className="h-5 w-5 text-white" />
+              </div>
+              <span className="font-bold text-xl bg-gradient-to-r from-orange-500 to-orange-600 bg-clip-text text-transparent">
+                FoodHealth
+              </span>
+            </div>
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              © {new Date().getFullYear()} FoodHealth. All rights reserved.
+            </p>
+            <div className="flex items-center gap-6">
+              <a href="#" className="text-sm text-gray-500 dark:text-gray-400 hover:text-orange-500 transition-colors">Privacy</a>
+              <a href="#" className="text-sm text-gray-500 dark:text-gray-400 hover:text-orange-500 transition-colors">Terms</a>
+              <a href="#" className="text-sm text-gray-500 dark:text-gray-400 hover:text-orange-500 transition-colors">Contact</a>
+            </div>
+          </div>
+        </div>
+      </footer>
     </div>
   )
 }
